@@ -1,0 +1,13 @@
+name: Trigger Greeting
+on:
+  workflow_dispatch:
+    inputs:
+      who-to-greet:
+        description: 'Who to greet'
+        required: true
+        default: 'World'
+jobs:
+  trigger:
+    uses: nomantis/triggered_greeting_receiving/.github/workflows/triggered_greeting.yml@master
+    with:
+      who-to-greet: 'nomantis'
