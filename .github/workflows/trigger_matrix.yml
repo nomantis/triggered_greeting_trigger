@@ -1,0 +1,25 @@
+name: Trigger Matrix
+on:
+  workflow_dispatch:
+    inputs:
+      elements:
+        description: 'Elements to matrix as comma separated list'
+        required: true
+        default: '1,2,3'
+jobs:
+  transform_input:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.transform_input.outputs.matrix }}
+    steps:
+      - name: Transform input
+        id: transform_input
+        run: |
+          MATRIX=$(echo "${{ github.event.inputs.elements }}" | jq -Rsc '{ "id": . | gsub("\\n"; "") | split(",") }')
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+
+  trigger:
+    needs: transform_input
+    uses: nomantis/triggered_greeting_receiving/.github/workflows/triggered_matrix.yml@master
+    with:
+      matrix: ${{ needs.transform_input.outputs.matrix }}
