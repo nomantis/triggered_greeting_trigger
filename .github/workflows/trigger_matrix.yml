@@ -20,6 +20,19 @@ jobs:
 
   trigger:
     needs: transform_input
-    uses: nomantis/triggered_greeting_receiving/.github/workflows/triggered_matrix.yml@master
-    with:
-      matrix: ${{ needs.transform_input.outputs.matrix }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger workflow
+        run: |
+          curl --request POST \
+            --url https://api.github.com/repos/nomantis/triggered_greeting_receiving/actions/workflows/triggered_matrix.yml/dispatches \
+            --header 'Accept: application/vnd.github+json' \
+            --header 'Authorization: Bearer ${{ secrets.AUTH_TOKEN }}' \
+            --header 'Content-Type: application/json' \
+            --header 'X-GitHub-Api-Version: 2022-11-28' \
+            --data '{
+              "ref": "master",
+              "inputs": {
+                "matrix": ${{ toJson(needs.transform_input.outputs.matrix) }}
+              }
+            }'
